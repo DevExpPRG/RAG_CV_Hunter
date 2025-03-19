@@ -30,9 +30,9 @@ def connect_qdrant():
     qdrant_client = QdrantClient(url=QDRANT_SERVER, api_key=API_KEY, timeout=20)
     try:
         qdrant_client.get_collections()
-        logging.info("✅ Conectado a Qdrant correctamente")
+        logging.info("✅ Successfully connected to Qdrant")
     except Exception as e:
-        logging.error(f"❌ Error al conectar con Qdrant: {e}")
+        logging.error(f"❌ Error connecting to Qdrant: {e}")
         exit(1)
     return qdrant_client
 
@@ -71,19 +71,19 @@ def process_pdf(pdf_path):
         docs = [Document(page_content=chunk, metadata={"source": pdf_path}) for chunk in splitter.split_text(text)]
         return docs
     else:
-        logging.error("❌ No se pudo extraer texto del PDF")
+        logging.error("❌Could not extract text from PDF")
         return []
 
 def retrieve_docs(query, k=5):
-    """Recupera documentos relevantes desde Qdrant."""
+    """Retrieve relevant documents from Qdrant."""
     return vectorstore.similarity_search(query, k=k)
 
 def format_context(docs):
-    """Formatea los documentos recuperados para el modelo."""
+    """Formats retrieved documents for the model."""
     return "\n".join([doc.page_content for doc in docs])
 
 async def rag_chat(user_query):
-    """Manejo principal de RAG."""
+    """Main RAG management."""
     retrieved_docs = retrieve_docs(user_query)
     context = format_context(retrieved_docs)
     messages = [SystemMessage(content=f"Context: {context}"), HumanMessage(content=user_query)]
